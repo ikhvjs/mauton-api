@@ -1,7 +1,7 @@
 {
-  "name": "books-api",
+  "name": "mauton-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "An api for mauton",
   "main": "DBconfig.js",
   "dependencies": {
     "cors": "^2.8.5",
@@ -17,5 +17,13 @@
     "start": "nodemon server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikhvjs/mauton-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ikhvjs/mauton-api/issues"
+  },
+  "homepage": "https://github.com/ikhvjs/mauton-api#readme"
 }
