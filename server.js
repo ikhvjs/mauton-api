@@ -153,12 +153,12 @@ app.put('/category/update',(req,res)=>{
   .update({
     blog_category_name: blog_category_name,
     blog_category_desc: blog_category_desc,
-    seq:seq
+    seq:seq,
+    last_updated_date:new Date(),
+    last_updated_by:'testingUser1'
   })
   .then(data=>res.json(data))
-  .catch(err => res.status(400).json('error update category'));
-
-
+  .catch(err => res.status(400).json('error update category'))
 })
 
 app.listen(3001, ()=> {
