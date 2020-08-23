@@ -127,7 +127,8 @@ app.delete('/category/delete',(req,res)=>{
 
 app.post('/category/search',(req,res)=>{
   const{blog_category_name,blog_category_desc} = req.body;
-  db.select('blog_category_id','blog_category_name'
+  db.orderBy('blog_category_id','desc')
+  .select('blog_category_id','blog_category_name'
     ,'blog_category_desc','seq')
   .from('tb_blog_category')
   .where('blog_category_name','~*',blog_category_name)
