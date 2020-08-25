@@ -1,10 +1,13 @@
-// import express from 'express';
-// import cors from 'cors';
-// import knex from 'knex';
-
 const express = require('express');
 const cors = require('cors');
 const knex = require('knex');
+
+const topbar = require('./controllers/topbar');
+const sidebar = require('./controllers/sidebar');
+const bloglist = require('./controllers/bloglist');
+const blog = require('./controllers/blog');
+const category = require('./controllers/category');
+const tag = require('./controllers/tag');
 
 const db = knex({
   client: 'pg',
@@ -16,151 +19,43 @@ const db = knex({
   }
 });
 
+//Debug for SQL
+// var toStringQuery = db.select.toString()
+//   console.log('toStringQuery',toStringQuery);
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/topbar', (req, res)=> {
-	db.select('menu_name','seq','menu_path','menu_id')
-	.from('tb_menu')
-  .where({menu_level:1})
-	.then(menu=>res.json(menu))
-	.catch(err => res.status(400).json('error getting menu'));
-});
+//Topbar
+app.get('/topbar',(req, res)=>{topbar.handleTopbarGet(req, res, db)})
 
-app.get('/sidebar/id/:topbarMenuID', (req, res)=> {
-  const { topbarMenuID } = req.params;
-  
-  db.select('menu_name','seq','menu_path','menu_id')
-  .from('tb_menu')
-  .where({parent_menu_id:topbarMenuID, menu_level:2})
-  .then(menu=>res.json(menu))
-  .catch(err => res.status(400).json('erro getting sidebar by id'));
-});
+//Sidebar
+app.get('/sidebar/id/:topbarMenuID', (req, res)=> {sidebar.handleSidebarGetByID(req,res,db)})
+app.get('/sidebar/path/:topbarMenuPath',(req, res)=>{sidebar.handleSidebarGetByPath(req,res,db)})
 
-app.get('/sidebar/path/:topbarMenuPath', (req, res)=> {
-  const { topbarMenuPath } = req.params;
-  
-  db.select('tm1.menu_name','tm1.seq','tm1.menu_path','tm1.menu_id')
-  .from('tb_menu as tm1')
-  .join('tb_menu as tm2', function() {
-    this.on('tm1.parent_menu_id', '=', 'tm2.menu_id')
-      .andOn('tm2.menu_level', '=', 1)
-      .andOn('tm1.menu_level', '=', 2)
-      .andOn('tm2.menu_path','=',db.raw('?',[topbarMenuPath]))
-  })
-  .then(menu=>res.json(menu))
-  .catch(err => res.status(400).json('erro getting sidebar by path'));
-});
+//Bloglist
+app.get('/bloglist/path/:sidebarMenuPath',(req, res)=>{bloglist.handleBloglistGet(req,res,db)})
 
-app.get('/bloglist/path/:sidebarMenuPath', (req, res)=> {
-   const { sidebarMenuPath } = req.params;
+//BLog
+app.get('/blog/path/:blogPath', (req, res)=> {blog.handleBlogGet(req,res,db)})
 
-  db.select('tb.blog_id','tb.blog_title',
-    'tb.blog_content','tb.seq',
-    'tb.blog_path','bc.blog_category_name')
-  .from('tb_blog as tb')
-  .join('tb_menu as tm', function() {
-    this.on('tb.menu_id', '=', 'tm.menu_id')
-      .andOn('tm.menu_path', '=',db.raw('?',[sidebarMenuPath]))
-  })
-  .join('tb_blog_category as bc', 'bc.blog_category_id', 'tb.blog_category_id')
-  .then(bloglist=>res.json(bloglist))
-  .catch(err => res.status(400).json('error getting blog'));
-});
+//Category
+app.get('/category/get', (req, res)=> {category.handleCategoryGet(req,res,db)})
+app.post('/category/create',(req,res)=>{category.handleCategoryPost(req,res,db)})
+app.delete('/category/delete',(req,res)=>{category.handleCategoryDelete(req,res,db)})
+app.post('/category/search',(req,res)=>{category.handleCategorySearch(req,res,db)})
+app.put('/category/update',(req,res)=>{category.handleCategoryUpdate(req,res,db)})
+
+//Tag
+app.get('/tag/get', (req, res)=> {tag.handleTagGet(req,res,db)})
+app.post('/tag/create',(req,res)=>{tag.handleTagPost(req,res,db)})
+app.delete('/tag/delete',(req,res)=>{tag.handleTagDelete(req,res,db)})
+app.post('/tag/search',(req,res)=>{tag.handleTagSearch(req,res,db)})
+app.put('/tag/update',(req,res)=>{tag.handleTagUpdate(req,res,db)})
 
 
-app.get('/blog/path/:blogPath', (req, res)=> {
-   const { blogPath } = req.params;
-
-  db.select('tb.blog_id','tb.blog_title','tb.blog_content',
-    'tb.seq', 'bc.blog_category_name',
-    'tb.blog_path')
-  .from('tb_blog as tb')
-  .join('tb_blog_category as bc', function() {
-    this.on('tb.blog_category_id', '=', 'bc.blog_category_id')
-      .andOn('tb.blog_path', '=',db.raw('?',[blogPath]))
-  })
-  .then(blog=>res.json(blog))
-  .catch(err => res.status(400).json('error getting blog'));
-});
-
-
-app.get('/category/get', (req, res)=> {
-  db.orderBy('blog_category_id','desc')
-  .select('blog_category_id','blog_category_name','blog_category_desc','seq')
-  .from('tb_blog_category')
-  .then(categories=>res.json(categories))
-  .catch(err => res.status(400).json('error getting category'));
-});
-
-
-app.post('/category/create',(req,res)=>{
-  const {blog_category_name, blog_category_desc, seq} = req.body;
-  // console.log('req.body',req.body);
-  db('tb_blog_category')
-  .returning(['blog_category_id','blog_category_name','blog_category_desc','seq'])
-  .insert({
-    blog_category_name: blog_category_name,
-    blog_category_desc:blog_category_desc,
-    seq:seq,
-    created_date:new Date(),
-    created_by:'testingUser1',
-    last_updated_date:new Date(),
-    last_updated_by:'testingUser1'
-  })
-  .then(data=>res.json(data))
-  .catch(err => res.status(400).json('error creating category'));
-
-});
-
-app.delete('/category/delete',(req,res)=>{
-  const {blog_category_id} = req.body;
-  db('tb_blog_category')
-  .where('blog_category_id', blog_category_id)
-  .del()
-  .then(data=>res.json(data))
-  .catch(err => res.status(400).json('error delete category'));
-
-})
-
-app.post('/category/search',(req,res)=>{
-  const{blog_category_name,blog_category_desc} = req.body;
-  db.orderBy('blog_category_id','desc')
-  .select('blog_category_id','blog_category_name'
-    ,'blog_category_desc','seq')
-  .from('tb_blog_category')
-  .where('blog_category_name','~*',blog_category_name)
-  .andWhere('blog_category_desc','~*',blog_category_desc)
-  .then(data=>res.json(data))
-  .catch(err => res.status(400).json('error search category'));
-
-// var toStringQuery = db.select('blog_category_id','blog_category_name'
-//     ,'blog_category_desc','seq')
-//   .from('tb_blog_category')
-//   .where('blog_category_name','~*',blog_category_name)
-//   .andWhere('blog_category_desc','~*',blog_category_desc)
-//   .toString()
-//   console.log('toStringQuery',toStringQuery);
-
-
-})
-
-app.put('/category/update',(req,res)=>{
-  const{blog_category_id,blog_category_name,blog_category_desc,seq} = req.body;
-  db('tb_blog_category')
-  .where('blog_category_id', '=', blog_category_id)
-  .update({
-    blog_category_name: blog_category_name,
-    blog_category_desc: blog_category_desc,
-    seq:seq,
-    last_updated_date:new Date(),
-    last_updated_by:'testingUser1'
-  })
-  .then(data=>res.json(data))
-  .catch(err => res.status(400).json('error update category'))
-})
 
 app.listen(3001, ()=> {
   console.log('app is running on port 3001');
