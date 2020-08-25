@@ -8,6 +8,7 @@ const bloglist = require('./controllers/bloglist');
 const blog = require('./controllers/blog');
 const category = require('./controllers/category');
 const tag = require('./controllers/tag');
+const menu1 = require('./controllers/menu1');
 
 const db = knex({
   client: 'pg',
@@ -55,7 +56,14 @@ app.delete('/tag/delete',(req,res)=>{tag.handleTagDelete(req,res,db)})
 app.post('/tag/search',(req,res)=>{tag.handleTagSearch(req,res,db)})
 app.put('/tag/update',(req,res)=>{tag.handleTagUpdate(req,res,db)})
 
+//Menu1
+app.get('/menu1/get', (req,res)=>{menu1.handleMenu1Get(req,res,db)})
+app.post('/menu1/create',(req,res)=>{menu1.handleMenu1Post(req,res,db)})
+app.delete('/menu1/delete',(req,res)=>{menu1.handleMenu1Delete(req,res,db)})
+app.post('/menu1/search',(req,res)=>{menu1.handleMenu1Search(req,res,db)})
+app.put('/menu1/update',(req,res)=>{menu1.handleMenu1Update(req,res,db)})
 
+//
 
 app.listen(3001, ()=> {
   console.log('app is running on port 3001');
