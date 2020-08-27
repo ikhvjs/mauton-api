@@ -1,8 +1,12 @@
 const handleMenu2Get =(req,res,db) =>{
 
 	db.orderBy('tm1.menu_id','desc')
-	.select('tm1.menu_id','tm1.menu_name','tm1.seq',
-		'tm1.menu_path','tm2.menu_name as parent_menu_name')
+	.select('tm1.menu_id',
+		'tm1.menu_name',
+		'tm1.seq',
+		'tm1.menu_path',
+		'tm2.menu_name as parent_menu_name',
+		'tm1.parent_menu_id')
 	.from('tb_menu as tm1')
 	.join('tb_menu as tm2', function() {
 		this.on('tm1.parent_menu_id', '=', 'tm2.menu_id')
@@ -41,16 +45,26 @@ const handleMenu2Delete=(req,res,db)=>{
 }
 
 const handleMenu2Search=(req,res,db)=>{
-	const{menu_name,menu_path} = req.body;
-	db.orderBy('menu_id','desc')
-	.select('menu_id','menu_name'
-		,'menu_path','seq')
-	.from('tb_menu')
-	.where('menu_name','~*',menu_name)
-	.andWhere('menu_path','~*',menu_path)
-	.andWhere('menu_level','=',2)
+	const{menu_name,menu_path,parent_menu_name} = req.body;
+
+
+	db.orderBy('tm1.menu_id','desc')
+	.select('tm1.menu_id',
+			'tm1.menu_name',
+			'tm1.menu_path',
+			'tm1.seq',
+			'tm2.menu_name as parent_menu_name',
+			'tm1.parent_menu_id')
+	.from('tb_menu as tm1')
+	.join('tb_menu as tm2', function() {
+		this.on('tm1.parent_menu_id', '=', 'tm2.menu_id')
+		.andOn('tm1.menu_level', '=',2)
+		.andOn('tm1.menu_name','~*',db.raw('?',[menu_name]))
+		.andOn('tm1.menu_path','~*',db.raw('?',[menu_path]))
+		.andOn('tm2.menu_name','~*',db.raw('?',[parent_menu_name]))
+	})
 	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error search menu2'));
+	.catch(err => res.status(400).json(err));
 }
 
 const handleMenu2Update=(req,res,db)=>{
