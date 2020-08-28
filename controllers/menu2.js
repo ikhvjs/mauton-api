@@ -68,13 +68,14 @@ const handleMenu2Search=(req,res,db)=>{
 }
 
 const handleMenu2Update=(req,res,db)=>{
-	const{menu_id,menu_name,menu_path,seq} = req.body;
+	const{menu_id,menu_name,menu_path,seq, parent_menu_id} = req.body;
 	db('tb_menu')
 	.where('menu_id', '=', menu_id)
 	.update({
 		menu_name: menu_name,
 		menu_path: menu_path,
 		seq:seq,
+		parent_menu_id:parent_menu_id, 
 		last_updated_date:new Date(),
 		last_updated_by:'testingUser1'
 	})
