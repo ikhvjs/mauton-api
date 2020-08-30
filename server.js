@@ -39,8 +39,9 @@ app.get('/sidebar/path/:topbarMenuPath',(req, res)=>{sidebar.handleSidebarGetByP
 
 //Bloglist
 app.get('/bloglist/path/:sidebarMenuPath',(req, res)=>{bloglist.handleBloglistGet(req,res,db)})
+app.post('/bloglist/search', (req, res)=> {bloglist.handleBloglistSearch(req,res,db)})
 
-//BLog
+//Blog
 app.get('/blog/path/:blogPath', (req, res)=> {blog.handleBlogGet(req,res,db)})
 
 //Category

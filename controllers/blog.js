@@ -1,8 +1,11 @@
 const handleBlogGet =(req,res,db)=>{
 	const { blogPath } = req.params;
 
-	db.select('tb.blog_id','tb.blog_title','tb.blog_content',
-		'tb.seq', 'bc.blog_category_name',
+	db.select('tb.blog_id',
+		'tb.blog_title',
+		'tb.blog_content',
+		'tb.seq',
+		'bc.blog_category_name',
 		'tb.blog_path')
 	.from('tb_blog as tb')
 	.join('tb_blog_category as bc', function() {
