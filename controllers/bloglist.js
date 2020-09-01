@@ -25,11 +25,9 @@ const handleBloglistGet = (req,res,db) =>{
 //   console.log('toStringQuery',toStringQuery);
 
 const handleBloglistSearch = (req,res,db) =>{
-	const { blog_title, blog_category_name, tag_name } = req.body;
+	const { blog_title, blog_category_name, tag_name, menu_path } = req.body;
 	
-
-	var toStringQuery = 
-	db.groupBy('tb.blog_id')
+	db.groupByRaw('1,2,3,4,5,6,7,8')
 	.select('tb.blog_id',
 		'tb.blog_title',
 		'tb.blog_content',
@@ -50,11 +48,13 @@ const handleBloglistSearch = (req,res,db) =>{
 	.join('tb_blog_category as tbc', function() {
 		this.on('tbc.blog_category_id', '=', 'tb.blog_category_id')
 		.andOn('tbc.blog_category_name', '~*',db.raw('?',[blog_category_name]))
-	}).toString()
-
-	console.log('toStringQuery',toStringQuery);
-	// .then(data=>res.json(data))
-	// .catch(err => res.status(400).json('error getting blog'));
+	})
+	.join('tb_menu as tm' ,function(){
+		this.on('tm.menu_id','=','tb.menu_id')
+		.andOn('tm.menu_path','=',db.raw('?',[menu_path]))
+	})
+	.then(data=>res.json(data))
+	.catch(err => res.status(400).json(err));
 }
 
 module.exports = {
