@@ -44,6 +44,8 @@ app.post('/bloglist/search', (req, res)=> {bloglist.handleBloglistSearch(req,res
 //Blog
 app.get('/blog/path/:blogPath', (req, res)=> {blog.handleBlogGet(req,res,db)})
 app.get('/blog/tag/path/:blogPath', (req,res)=>{blog.handleBlogTagGet(req,res,db)})
+app.get('/blog/category/get',(req,res)=> {blog.handleBlogCategoryGet(req,res,db)})
+app.post('/blog/category/search',(req,res)=>{blog.handleBlogCategorySearch(req,res,db)})
 
 //Category
 app.get('/category/get', (req, res)=> {category.handleCategoryGet(req,res,db)})

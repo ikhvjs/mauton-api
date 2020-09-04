@@ -38,7 +38,29 @@ const handleBlogTagGet = (req,res,db) =>{
 
 }
 
+const handleBlogCategoryGet = (req,res,db) =>{
+	db.orderBy('blog_category_id','desc')
+	.select('blog_category_id','blog_category_name','blog_category_desc','seq')
+	.from('tb_blog_category')
+	.then(data=>res.json(data))
+	.catch(err => res.status(400).json('error get blog category'));
+}
+
+const handleBlogCategorySearch=(req,res,db)=>{
+	const{blog_category_name,blog_category_desc} = req.body;
+	db.orderBy('blog_category_id','desc')
+	.select('blog_category_id','blog_category_name'
+		,'blog_category_desc','seq')
+	.from('tb_blog_category')
+	.where('blog_category_name','~*',blog_category_name)
+	.andWhere('blog_category_desc','~*',blog_category_desc)
+	.then(data=>res.json(data))
+	.catch(err => res.status(400).json('error search blog category'));
+}
+
 module.exports = {
   handleBlogGet,
-  handleBlogTagGet
+  handleBlogTagGet,
+  handleBlogCategoryGet,
+  handleBlogCategorySearch
 }
