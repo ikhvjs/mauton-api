@@ -6,6 +6,7 @@ const handleBlogGet =(req,res,db)=>{
 		'tb.blog_content',
 		'tb.seq',
 		'bc.blog_category_name',
+		'tb.tag_group_id',
 		'tb.blog_path',
 		'tb.blog_desc',
 		'tb.last_updated_date')
@@ -14,6 +15,26 @@ const handleBlogGet =(req,res,db)=>{
 		this.on('tb.blog_category_id', '=', 'bc.blog_category_id')
 	.andOn('tb.blog_path', '=',db.raw('?',[blogPath]))
 	})
+	.then(blog => {
+		// console.log('blog',blog[0]);
+
+		return db.select(
+				'tt.tag_id',
+				'tt.tag_name')
+			.from('tb_tag as tt')
+			.join('tb_tag_link as ttl', function(){
+				this.on('ttl.tag_group_id','=',blog[0].tag_group_id)
+				.andOn('ttl.tag_id','=','tt.tag_id')
+			})
+			.then(tags => {
+	            // console.log('tags',tags);
+	            Object.assign(blog[0],{tags:[...tags]})
+	         	return blog;
+	        })
+	        ;
+		
+		
+    })
 	.then(data=>res.json(data))
 	.catch(err => res.status(400).json('error getting blog'));
 }
