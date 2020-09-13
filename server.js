@@ -49,6 +49,7 @@ app.post('/blog/category/search',(req,res)=>{blog.handleBlogCategorySearch(req,r
 app.get('/blog/tag/get',(req,res)=>{blog.handleBlogTagGet(req,res,db)})
 app.post('/blog/tag/search',(req,res)=>{blog.handleBlogTagSearch(req,res,db)})
 app.post('/blog/create',(req,res)=>{blog.handleBlogPost(req,res,db)})
+app.put('/blog/update', (req,res)=>{blog.handleBlogUpdate(req,res,db)})
 
 //Category
 app.get('/category/get', (req, res)=> {category.handleCategoryGet(req,res,db)})

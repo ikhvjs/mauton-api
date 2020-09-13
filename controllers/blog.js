@@ -6,6 +6,7 @@ const handleBlogGet =(req,res,db)=>{
 		'tb.blog_content',
 		'tb.seq',
 		'bc.blog_category_name',
+		'bc.blog_category_id',
 		'tb.tag_group_id',
 		'tb.blog_path',
 		'tb.blog_desc',
@@ -156,7 +157,10 @@ const handleBlogPost =(req,res,db)=>{
 
     })
     .catch(err => res.status(400).json(err))
+}
 
+
+const handleBlogUpdate =(res,req,db)=>{
 
 }
 
@@ -168,5 +172,6 @@ module.exports = {
   handleBlogCategorySearch,
   handleBlogTagGet,
   handleBlogTagSearch,
-  handleBlogPost
+  handleBlogPost,
+  handleBlogUpdate
 }
