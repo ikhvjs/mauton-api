@@ -160,9 +160,61 @@ const handleBlogPost =(req,res,db)=>{
 }
 
 
-const handleBlogUpdate =(res,req,db)=>{
+const handleBlogUpdate =(req,res,db)=>{
+	const{ updateBlog } = req.body;
+	console.log('updateBlog',updateBlog);
+
+
+	db.transaction(trx => {
+    	trx('tb_blog')
+  		.where({ blog_id: updateBlog.blog_id })
+  		.update({ 	blog_title: updateBlog.blog_title,
+	      			blog_desc: updateBlog.blog_desc,
+	      			blog_path: updateBlog.blog_path,
+	      			blog_category_id: updateBlog.blog_category_id,
+	      			seq: updateBlog.seq,
+	      			blog_content: updateBlog.blog_content,
+				    last_updated_date:new Date(),
+				    last_updated_by:'testingUser1' 
+  		}, ['tag_group_id'])
+  		.then( data => {
+  			let tag_group_id = data[0].tag_group_id;
+  			console.log('tag_group_id',tag_group_id);
+  			return trx('tb_tag_link')
+		  	.where('tag_group_id', tag_group_id)
+		 	.del()
+  		})
+  		.then(data=>{
+  			console.log('deleted row', data)
+  			const promises = updateBlog.tags.map((tag)=>{
+				// console.log('tag',tag);
+				return trx('tb_tag_link')
+				.returning('tag_link_id')
+				.insert({
+					tag_group_id: data,
+					tag_id: tag.tag_id,
+					created_date:new Date(),
+				    created_by:'testingUser1',
+				    last_updated_date:new Date(),
+				    last_updated_by:'testingUser1'
+				})
+				.then(tag_link_id => {
+	            // console.log('tag_link_id',tag_link_id[0]);
+	         	return tag_link_id[0];
+	         	})	
+			})
+
+			return Promise.all(promises);
+  		})
+  		.then(trx.commit)
+      	.catch(trx.rollback)
+
+  	})
+  	.catch(err => res.status(400).json(err))
 
 }
+    
+
 
 
 module.exports = {
