@@ -6,7 +6,6 @@ const handleBloglistGet = (req,res,db) =>{
 		'tb.blog_content',
 		'tb.seq',
 		'tb.blog_path',
-		'tb.tag_group_id',
 		'bc.blog_category_name',
 		'tb.blog_desc',
 		'tb.last_updated_date')
@@ -25,9 +24,9 @@ const handleBloglistGet = (req,res,db) =>{
 					'tt.tag_id',
 					'tt.tag_name')
 				.from('tb_tag as tt')
-				.join('tb_tag_link as ttl', function(){
-					this.on('ttl.tag_group_id','=',blog.tag_group_id)
-					.andOn('ttl.tag_id','=','tt.tag_id')
+				.join('tb_blog_tag_link as tbtl', function(){
+					this.on('tbtl.blog_id','=',blog.blog_id)
+					.andOn('tbtl.tag_id','=','tt.tag_id')
 				})
 				.then(tags => {
 		            // console.log('tags',tags);
@@ -60,13 +59,13 @@ const handleBloglistSearch = (req,res,db) =>{
 		'tbc.blog_category_name',
 		'tb.blog_desc',
 		'tb.last_updated_date')
-	.from('tb_tag_link as ttl')
+	.from('tb_blog_tag_link as tbtl')
 	.join('tb_blog as tb', function() {
-		this.on('ttl.tag_group_id', '=', 'tb.tag_group_id')
+		this.on('tbtl.blog_id', '=', 'tb.blog_id')
 	  	.andOn('tb.blog_title', '~*',db.raw('?',[blog_title]))
 	})
 	.join('tb_tag as tt', function() {
-		this.on('ttl.tag_id', '=', 'tt.tag_id')
+		this.on('tbtl.tag_id', '=', 'tt.tag_id')
 	  	.andOn('tt.tag_name', '~*',db.raw('?',[tag_name]))
 	})
 	.join('tb_blog_category as tbc', function() {
