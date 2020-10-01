@@ -11,13 +11,21 @@ const tag = require('./controllers/tag');
 const menu1 = require('./controllers/menu1');
 const menu2 = require('./controllers/menu2');
 
+// const db = knex({
+//   client: 'pg',
+//   connection: {
+//     host : '127.0.0.1',
+//     user : 'postgres',
+//     password : '123a123a',
+//     database : 'books'
+//   }
+// });
+
 const db = knex({
   client: 'pg',
   connection: {
-    host : '127.0.0.1',
-    user : 'postgres',
-    password : '123a123a',
-    database : 'books'
+    host : process.env.DATABASE_URL,
+    ssl:true
   }
 });
 
