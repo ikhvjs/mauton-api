@@ -32,6 +32,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+//Home
+app.get('/',(req, res)=>res.json('Hello World'))
+
 //Topbar
 app.get('/topbar',(req, res)=>{topbar.handleTopbarGet(req, res, db)})
 
