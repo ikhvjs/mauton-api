@@ -82,7 +82,7 @@ app.delete('/menu2/delete',(req,res)=>{menu2.handleMenu2Delete(req,res,db)})
 app.post('/menu2/search',(req,res)=>{menu2.handleMenu2Search(req,res,db)})
 app.put('/menu2/update',(req,res)=>{menu2.handleMenu2Update(req,res,db)})
 
-app.listen(3001, ()=> {
-  console.log('app is running on port 3001');
+app.listen(process.env.PORT || 3001, ()=> {
+  console.log(`app is running on port ${process.env.PORT}`);
 });
 
