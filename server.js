@@ -24,7 +24,7 @@ const menu2 = require('./controllers/menu2');
 const db = knex({
   client: 'pg',
   connection: {
-    host : process.env.DATABASE_URL,
+    connectionString : process.env.DATABASE_URL,
     ssl:true
   }
 });
