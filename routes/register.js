@@ -2,17 +2,22 @@ const db = require('../database')
 const express = require('express');
 const crypto = require('crypto');
 const token = require('../token');
+const { validateRegister } = require('../validation/validateRegister');
+const { NO_ERROR, INTERNAL_SERVER_ERROR } = require('../validation/validationConstants');
+
 
 const register = express.Router();
 
-register.post('/', (req,res) => {
+register.post('/', async (req,res) => {
 	const { email, password, username } = req.body;
-
+	const validationResult = await validateRegister(email,password,username);
+	
 	console.log('body',req.body);
+	// console.log('validationResult',await validationResult);
 
-  	if (!email || !password || !username) {
-    	return res.status(400).json('incorrect form submission');
-  	}
+	if (await validationResult.Code !== NO_ERROR){
+		return res.status(400).send(validationResult);
+	}
 
   	const hash = crypto.createHash('sha256').update(password).digest('hex');
 
@@ -35,7 +40,7 @@ register.post('/', (req,res) => {
         res.header('Pragma', 'no-cache');
         res.json(token.createToken(user[0]));
 	})
-  	.catch(err => res.status(400).json(err));
+  	.catch(err => res.status(400).send({ Code: INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error, please try again' }));
     
 });
 
