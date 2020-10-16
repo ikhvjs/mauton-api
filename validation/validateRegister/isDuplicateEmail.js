@@ -1,10 +1,10 @@
-const db = require('../database');
+const db = require('../../database');
 
 module.exports = {
-    isDuplicateUsername: async function(username){
+    isDuplicateEmail: async function(email){
          return db.select('*')
                 .from('tb_user')
-                .where('user_name', '=', username)
+                .where('email', '=', email)
                 .then(user => {
                     return (user.length > 0)?true:false
                 })

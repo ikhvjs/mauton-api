@@ -2,7 +2,7 @@ const db = require('../database')
 const express = require('express');
 const crypto = require('crypto');
 const token = require('../token');
-const { validateRegister } = require('../validation/validateRegister');
+const { validateRegister } = require('../validation/validateRegister/validateRegister');
 const { NO_ERROR, INTERNAL_SERVER_ERROR } = require('../validation/validationConstants');
 
 
@@ -12,7 +12,7 @@ register.post('/', async (req,res) => {
 	const { email, password, username } = req.body;
 	const validationResult = await validateRegister(email,password,username);
 	
-	console.log('body',req.body);
+	// console.log('body',req.body);
 	// console.log('validationResult',await validationResult);
 
 	if (await validationResult.Code !== NO_ERROR){
@@ -38,9 +38,9 @@ register.post('/', async (req,res) => {
 		//   console.log('user',user[0]);
 		res.header('Cache-Control', 'no-store');
         res.header('Pragma', 'no-cache');
-        res.json(token.createToken(user[0]));
+        return res.json(token.createToken(user[0]));
 	})
-  	.catch(err => res.status(400).send({ Code: INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error, please try again' }));
+  	.catch( ()=>(res.status(400).send({ Code: INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error, please try again' })));
     
 });
 

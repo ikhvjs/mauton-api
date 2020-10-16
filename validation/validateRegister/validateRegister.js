@@ -1,14 +1,15 @@
 
+const { isMandatoryFieldNotFilled } = require('./isMandatoryFieldNotFilled');
 const { isValidEmail } = require('./isValidEmail');
 const { isValidUsername } = require('./isValidUsername');
 const { isValidPassword} = require('./isValidPassword');
 const { isDuplicateEmail } = require('./isDuplicateEmail');
 const { isDuplicateUsername } = require('./isDuplicateUsername');
-const constants = require('./validationConstants');
+const constants = require('../validationConstants');
 
 module.exports = {
     validateRegister: async function (email, password, username) {
-        if (!email || !password || !username) {
+        if (isMandatoryFieldNotFilled(email, password, username)) {
             return ({ Code: constants.REG_MANDATORY_FIELD, errMessage: 'Username, Email, Password are Mandatory' });
         }
 
@@ -26,7 +27,7 @@ module.exports = {
 
         const isDuplicateEmailResult = await isDuplicateEmail(email);
         if ( typeof(isDuplicateEmailResult) !== "boolean"){
-            return({ Code: constants.INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error' });
+            return({ Code: constants.INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error, please try again' });
         }else{
             if(isDuplicateEmailResult) 
                 return({ Code: constants.REG_DUPLICATE_EMAIL, errMessage: 'Email is used' });
@@ -40,6 +41,6 @@ module.exports = {
                 return({ Code: constants.REG_DUPLICATE_USERNAME, errMessage: 'Username is used' });
         }
 
-        return ({ Code: constants.NO_ERROR, errMessage: null });
+        return ({ Code: constants.NO_ERROR });
     }
 }
