@@ -5,10 +5,16 @@ const { isValidUsername } = require('./isValidUsername');
 const { isValidPassword} = require('./isValidPassword');
 const { isDuplicateEmail } = require('./isDuplicateEmail');
 const { isDuplicateUsername } = require('./isDuplicateUsername');
+const { isValidCaptchaToken } = require('./isValidCaptchaToken');
 const constants = require('../validationConstants');
 
 module.exports = {
-    validateRegister: async function (email, password, username) {
+    validateRegister: async function (email, password, username,captchaToken) {
+
+        if (!await isValidCaptchaToken(captchaToken)){
+            return ({ Code: constants.REG_INVALID_CAPTCHA_TOKEN, errMessage: 'Captcha Test Failed, please try again' });
+        }
+
         if (isMandatoryFieldNotFilled(email, password, username)) {
             return ({ Code: constants.REG_MANDATORY_FIELD, errMessage: 'Username, Email, Password are Mandatory' });
         }

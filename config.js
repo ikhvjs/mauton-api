@@ -4,7 +4,8 @@ const configs = {
     base: {
         env,
         tokenExpiredTime : 2000, //in seconds
-        secret: "secretKey for sessions",
+		secret: "secretKey for sessions",
+		captchaSecret: "",
     },
     dev: {
     	port:3001,

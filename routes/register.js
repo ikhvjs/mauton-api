@@ -9,10 +9,10 @@ const { NO_ERROR, INTERNAL_SERVER_ERROR } = require('../validation/validationCon
 const register = express.Router();
 
 register.post('/', async (req,res) => {
-	const { email, password, username } = req.body;
-	const validationResult = await validateRegister(email,password,username);
+	const { email, password, username, captchaToken } = req.body;
+	const validationResult = await validateRegister(email,password,username,captchaToken);
 	
-	// console.log('body',req.body);
+	console.log('body',req.body);
 	// console.log('validationResult',await validationResult);
 
 	if (await validationResult.Code !== NO_ERROR){
