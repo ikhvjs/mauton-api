@@ -3,7 +3,7 @@ const express = require('express');
 const crypto = require('crypto');
 const token = require('../token');
 const { validateRegister } = require('../validation/validateRegister/validateRegister');
-const { NO_ERROR, INTERNAL_SERVER_ERROR } = require('../validation/validationConstants');
+const { NO_ERROR, INTERNAL_SERVER_ERROR_REG_INSERT } = require('../validation/validationConstants');
 
 
 const register = express.Router();
@@ -35,12 +35,14 @@ register.post('/', async (req,res) => {
 	    last_updated_by:username.toLowerCase()
   	})
   	.then(user=>{
-		//   console.log('user',user[0]);
+		// console.log('user',user[0]);
 		res.header('Cache-Control', 'no-store');
         res.header('Pragma', 'no-cache');
         return res.json(token.createToken(user[0]));
 	})
-  	.catch( ()=>(res.status(400).send({ Code: INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error, please try again' })));
+  	.catch( ()=>(res.status(400).send({ Code: INTERNAL_SERVER_ERROR_REG_INSERT
+			, errMessage: 'Internal Server Error, please try again' }))
+	);
     
 });
 

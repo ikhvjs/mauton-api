@@ -2,7 +2,7 @@ const { captchaSecret } = require('../../config');
 const fetch = require('node-fetch');
 
 module.exports = {
-    isValidCaptchaToken:  async function (captchaToken) {
+    isValidLoginCaptchaToken:  async function (captchaToken) {
         return fetch("https://www.google.com/recaptcha/api/siteverify", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },

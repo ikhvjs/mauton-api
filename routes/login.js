@@ -3,14 +3,17 @@ const express = require('express');
 const db = require('../database');
 const crypto = require('crypto');
 const token = require('../token');
-const { NO_ERROR, INTERNAL_SERVER_ERROR, SIGNIN_INVALID_CLIENT } = require('../validation/validationConstants');
+const { NO_ERROR, 
+    INTERNAL_SERVER_ERROR_SIGNIN_SELECT, 
+    SIGNIN_INVALID_CLIENT 
+} = require('../validation/validationConstants');
 const { validateLogin } = require('../validation/validateLogin/validateLogin');
 
 const login = express.Router();
 
 login.post('/', async (req,res) => {
-    const { email, password, grant_type } = req.body;
-    const validationResult = await validateLogin(email,password,grant_type);
+    const { email, password, grant_type, captchaToken } = req.body;
+    const validationResult = await validateLogin(email,password,grant_type,captchaToken);
     
     // console.log('login',req.body);
     if (await validationResult.Code !== NO_ERROR){
@@ -33,7 +36,7 @@ login.post('/', async (req,res) => {
         })
         return res.status(200).json(token.createToken(user[0]))
     })
-    .catch( ()=> (res.status(400).send({ Code: INTERNAL_SERVER_ERROR, errMessage: 'Internal Server Error, please try again' })))
+    .catch( ()=> (res.status(400).send({ Code: INTERNAL_SERVER_ERROR_SIGNIN_SELECT, errMessage: 'Internal Server Error, please try again' })))
     
 });
 
