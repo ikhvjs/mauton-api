@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const config = require('./config');
 
 function verifyToken (req, res, next) {
-    // if no JWT
+	// if no JWT
+	// console.debug('in verifyToken header auth',req.headers.authorization);
     if (!req.headers.authorization) {
         res.customStatus = 401;
         res.customError = { error: 'invalid_client', error_description: 'no token' };
@@ -12,6 +13,7 @@ function verifyToken (req, res, next) {
     	&& req.headers.authorization.split(' ')[0] == 'Bearer') {
         jwt.verify(req.headers.authorization.split(' ')[1], config.secret,
         	function (err, decoded) {
+				console.debug('in decode');
 	            if (err) {
 	                res.customStatus = 400;
 	                switch (err.name) {
