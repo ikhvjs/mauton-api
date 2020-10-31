@@ -16,7 +16,7 @@ app.use('/register', require('./routes/register'));
 app.use('/login', require('./routes/login'));
 
 //token verify: All request below this, it would be verified.
-app.use(token.verifyToken);
+// app.use(token.verifyToken);
 
 //routing
 routing(app);

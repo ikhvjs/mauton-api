@@ -46,6 +46,50 @@ bloglist.get('/path/:sidebarMenuPath', (req,res) => {
 	.catch(err => res.status(400).json('error getting blog'));
 });
 
+bloglist.get('/id/:sidebarMenuID', (req,res) => {
+	const { sidebarMenuID } = req.params;
+
+	db.select('tb.blog_id',
+		'tb.blog_title',
+		'tb.blog_content',
+		'tb.seq',
+		'tb.blog_path',
+		'bc.blog_category_name',
+		'tb.blog_desc',
+		'tb.last_updated_date')
+	.from('tb_blog as tb')
+	.join('tb_menu as tm', function() {
+		this.on('tb.menu_id', '=', 'tm.menu_id')
+	  	.andOn('tm.menu_id', '=',db.raw('?',[sidebarMenuID]))
+	})
+	.join('tb_blog_category as bc', 'bc.blog_category_id', 'tb.blog_category_id')
+	.then(blogs => {
+		// console.log('blogs',blogs);
+
+		const promises = blogs.map((blog)=>{
+			// console.log('blog',blog);
+			return db.select(
+					'tt.tag_id',
+					'tt.tag_name')
+				.from('tb_tag as tt')
+				.join('tb_blog_tag_link as tbtl', function(){
+					this.on('tbtl.blog_id','=',blog.blog_id)
+					.andOn('tbtl.tag_id','=','tt.tag_id')
+				})
+				.then(tags => {
+		            // console.log('tags',tags);
+		            Object.assign(blog,{tags:[...tags]})
+		         	return blog;
+		        })
+		        ;
+		});
+		
+	    return Promise.all(promises);
+    })
+	.then(data=>res.json(data))
+	.catch(err => res.status(400).json('error getting blog'));
+});
+
 bloglist.post('/search', (req,res) => {
 	const { blog_title, blog_category_name, tag_name, menu_path } = req.body;
 	
