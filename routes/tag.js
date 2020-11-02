@@ -2,7 +2,11 @@ const db = require('../database')
 const express = require('express');
 const tag = express.Router();
 const { validateCreateTag } = require('../validation/validateTag/validateCreateTag'); 
-const { INTERNAL_SERVER_ERROR_TAG_INSERT,INTERNAL_SERVER_ERROR_TAG_SEARCH } = require('../validation/validationConstants');
+const { validateDeleteTag } = require('../validation/validateTag/validateDeleteTag'); 
+const {  INTERNAL_SERVER_ERROR_TAG_INSERT,
+		INTERNAL_SERVER_ERROR_TAG_SEARCH,
+		INTERNAL_SERVER_ERROR_TAG_DELETE 
+}  = require('../validation/validationConstants');
 
 tag.post('/request', (req,res) => {
 	const {userID} = req.body;
@@ -49,13 +53,27 @@ tag.post('/create', async (req,res) => {
 	// });
 });
 
-tag.delete('/delete', (req,res) => {
-	const {tag_id} = req.body;
+tag.delete('/delete', async (req,res) => {
+	const {tag_id,user_id} = req.body;
+
+	const validationResult = await validateDeleteTag(tag_id,user_id);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
+
 	db('tb_tag')
 	.where('tag_id', tag_id)
+	.andWhere('user_id',user_id)
 	.del()
 	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error delete tag'));
+	.catch( ()=>(res.status(500).send({ 
+		Code: INTERNAL_SERVER_ERROR_TAG_DELETE,
+		errMessage: 'Internal Server Error, please try again' 
+	})));
 });
 tag.post('/search', (req,res) => {
 	const{tag_name, user_id} = req.body;
