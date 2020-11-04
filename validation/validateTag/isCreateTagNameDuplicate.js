@@ -1,7 +1,7 @@
 const db = require('../../database');
 
 module.exports = {
-    isTagNameDuplicate: async function(tagName,userID){
+    isCreateTagNameDuplicate: async function(tagName,userID){
          return db.select('*')
                 .from('tb_tag')
                 .where({tag_name:tagName,

@@ -1,6 +1,6 @@
 
 const { isTagMandatoryFieldNotFilled } = require('./isTagMandatoryFieldNotFilled');
-const { isCreateTagNameDuplicate } = require('./isCreateTagNameDuplicate');
+const { isUpdateTagNameDuplicate } = require('./isUpdateTagNameDuplicate');
 const {
     TAG_MANDATORY_FIELD,
     TAG_DUPLICATE_TAG_NAME,
@@ -8,13 +8,13 @@ const {
 } = require('../validationConstants');
 
 module.exports = {
-    validateCreateTag: async function (tagName, tagSeq, userID) {
-        //frontend supposed to guard this, just in case someone hack the js in frontend
+    validateUpdateTag: async function (tagID,tagName, tagSeq, userID) {
+        //frontend supposed to guard this, just in case someone change the js in frontend
         if (isTagMandatoryFieldNotFilled(tagName,tagSeq)) {
             return ({ Status:400, Code: TAG_MANDATORY_FIELD, errMessage: 'Tag Name and Seq is Mandatory' });
         }
 
-        const isTagNameDuplicateResult = await isCreateTagNameDuplicate(tagName,userID);
+        const isTagNameDuplicateResult = await isUpdateTagNameDuplicate(tagName,userID,tagID);
         if (typeof(isTagNameDuplicateResult) !== "boolean") {
             return({ Status:500, Code: INTERNAL_SERVER_ERROR_TAG_CHECK_DUP, errMessage: 'Internal Server Error, please try again' });
         }else{

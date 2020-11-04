@@ -3,10 +3,12 @@ const express = require('express');
 const tag = express.Router();
 const { validateCreateTag } = require('../validation/validateTag/validateCreateTag'); 
 const { validateDeleteTag } = require('../validation/validateTag/validateDeleteTag'); 
+const { validateUpdateTag } = require('../validation/validateTag/validateUpdateTag'); 
 const {  	INTERNAL_SERVER_ERROR_TAG_INSERT,
 			INTERNAL_SERVER_ERROR_TAG_REQUEST,
 			INTERNAL_SERVER_ERROR_TAG_SEARCH,
-			INTERNAL_SERVER_ERROR_TAG_DELETE 
+			INTERNAL_SERVER_ERROR_TAG_DELETE,
+			INTERNAL_SERVER_ERROR_TAG_UPDATE
 }  = require('../validation/validationConstants');
 
 tag.post('/request', (req,res) => {
@@ -93,18 +95,35 @@ tag.post('/search', (req,res) => {
 	})));
 	// .catch(err => res.status(400).json('error search tag'));
 });
-tag.put('/update', (req,res) => {
-	const{tag_id,tag_name,seq} = req.body;
+tag.put('/update', async (req,res) => {
+	const {tagID,tagName,seq,userID} = req.body;
+
+	const validationResult = await validateUpdateTag(tagID,tagName,seq,userID);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
 	db('tb_tag')
-	.where('tag_id', '=', tag_id)
+	.where('tag_id', '=', tagID)
+	.andWhere('user_id','=',userID)
 	.update({
-		tag_name: tag_name,
+		tag_name: tagName,
 		seq:seq,
 		last_updated_date:new Date(),
-		last_updated_by:'testingUser1'
+		last_updated_by:userID
 	})
-	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error update tag'))
+	.then(result=>{
+		res.status(200).json(result);
+	})
+	.catch( ()=>(res.status(500).send({ 
+		Code: INTERNAL_SERVER_ERROR_TAG_UPDATE,
+		errMessage: 'Internal Server Error, please try again' 
+	})));
+	// .then(data=>res.json(data))
+	// .catch(err => res.status(400).json('error update tag'))
 });
 
 module.exports = tag
