@@ -20,14 +20,14 @@ tag.post('/request', (req,res) => {
 	.then(tags=>res.json(tags))
 	.catch(() => res.status(500).json(
 		{Code:INTERNAL_SERVER_ERROR_TAG_REQUEST,
-			errMessage:'Internal Server Error, please click Search button to load tags again'})
+			errMessage:'Internal Server Error, please click Search button to try again'})
 	);
 });
 
 tag.post('/create', async (req,res) => {
-	const {tag_name,seq,user_id} = req.body;
+	const {tagName,seq,userID} = req.body;
 
-	const validationResult = await validateCreateTag(tag_name,seq,user_id);
+	const validationResult = await validateCreateTag(tagName,seq,userID);
 
 	if (await validationResult.Status !== 200){
 		return res.status(validationResult.Status).send({
@@ -38,13 +38,13 @@ tag.post('/create', async (req,res) => {
 
 	db('tb_tag')
   	.insert({
-    	tag_name: tag_name,
+    	tag_name: tagName,
 	    seq:seq,
 	    created_date:new Date(),
-	    created_by:user_id,
+	    created_by:userID,
 	    last_updated_date:new Date(),
-		last_updated_by:user_id,
-		user_id:user_id
+		last_updated_by:userID,
+		user_id:userID
   	})
   	.then(result=>{
 		  res.status(200).json(`command:${result.command},rowCount:${result.rowCount}`);
@@ -82,13 +82,13 @@ tag.delete('/delete', async (req,res) => {
 	})));
 });
 tag.post('/search', (req,res) => {
-	const{tag_name, user_id} = req.body;
+	const{tagName, userID} = req.body;
 	db.orderBy('tag_id','desc')
 	.select('tag_id','tag_name','seq')
 	.from('tb_tag')
-	.where('tag_name','~*',tag_name)
-	.andWhere('user_id','=',user_id)
-	.then(data=>res.status(200).json(data))
+	.where('tag_name','~*',tagName)
+	.andWhere('user_id','=',userID)
+	.then(tags=>res.status(200).json(tags))
 	.catch( ()=>(res.status(500).send({ 
 		Code: INTERNAL_SERVER_ERROR_TAG_SEARCH,
 		errMessage: 'Internal Server Error, please try again' 
@@ -127,70 +127,3 @@ tag.put('/update', async (req,res) => {
 });
 
 module.exports = tag
-
-
-// const handleTagGet =(req,res,db)=>{
-// 	db.orderBy('tag_id','desc')
-// 	.select('tag_id','tag_name','seq')
-// 	.from('tb_tag')
-// 	.then(tags=>res.json(tags))
-// 	.catch(err => res.status(400).json('error getting tag'));
-// }
-
-// const handleTagPost =(req,res,db)=>{
-//   const {tag_name,seq} = req.body;
-//   // console.log('req.body',req.body);
-//   db('tb_tag')
-//   .insert({
-//     tag_name: tag_name,
-//     seq:seq,
-//     created_date:new Date(),
-//     created_by:'testingUser1',
-//     last_updated_date:new Date(),
-//     last_updated_by:'testingUser1'
-//   })
-//   .then(data=>res.json(data))
-//   .catch(err => res.status(400).json('error creating tag'));
-// }
-
-// const handleTagDelete=(req,res,db)=>{
-// 	const {tag_id} = req.body;
-// 	db('tb_tag')
-// 	.where('tag_id', tag_id)
-// 	.del()
-// 	.then(data=>res.json(data))
-// 	.catch(err => res.status(400).json('error delete tag'));
-// }
-
-// const handleTagSearch=(req,res,db)=>{
-// 	const{tag_name} = req.body;
-// 	db.orderBy('tag_id','desc')
-// 	.select('tag_id','tag_name','seq')
-// 	.from('tb_tag')
-// 	.where('tag_name','~*',tag_name)
-// 	.then(data=>res.json(data))
-// 	.catch(err => res.status(400).json('error search tag'));
-// }
-
-// const handleTagUpdate=(req,res,db)=>{
-// 	const{tag_id,tag_name,seq} = req.body;
-// 	db('tb_tag')
-// 	.where('tag_id', '=', tag_id)
-// 	.update({
-// 		tag_name: tag_name,
-// 		seq:seq,
-// 		last_updated_date:new Date(),
-// 		last_updated_by:'testingUser1'
-// 	})
-// 	.then(data=>res.json(data))
-// 	.catch(err => res.status(400).json('error update tag'))
-// }
-
-
-// module.exports = {
-//   handleTagGet,
-//   handleTagPost,
-//   handleTagDelete,
-//   handleTagSearch,
-//   handleTagUpdate
-// }
