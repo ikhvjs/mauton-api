@@ -5,9 +5,9 @@ const {
 } = require('../validationConstants');
 
 module.exports = {
-    validateDeleteTag: async function (tagID, userID) {
+    validateDeleteTag: async function (tagID) {
         
-        const isTagForeignKeyExistResult = await isTagForeignKeyExist(tagID,userID);
+        const isTagForeignKeyExistResult = await isTagForeignKeyExist(tagID);
         if (typeof(isTagForeignKeyExistResult) !== "boolean") {
             return({ Status:500, Code: INTERNAL_SERVER_ERROR_TAG_CHECK_FOREIGN_KEY, errMessage: 'Internal Server Error, please try again' });
         }else{

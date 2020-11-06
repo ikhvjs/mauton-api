@@ -2,9 +2,11 @@ const db = require('../database')
 const express = require('express');
 const category = express.Router();
 const { validateCreateCategory } = require('../validation/validateCategory/validateCreateCategory'); 
+const { validateDeleteCategory } = require('../validation/validateCategory/validateDeleteCategory'); 
 const {	INTERNAL_SERVER_ERROR_CATEGORY_REQUEST,
 		INTERNAL_SERVER_ERROR_CATEGORY_SEARCH,
 		INTERNAL_SERVER_ERROR_CATEGORY_CREATE,
+		INTERNAL_SERVER_ERROR_CATEGORY_DELETE
 }  = require('../validation/validationConstants');
 
 category.post('/request', (req,res) => {
@@ -52,13 +54,27 @@ category.post('/create', async (req,res) => {
 	);
 });
 
-category.delete('/delete', (req,res) => {
-	const {blog_category_id} = req.body;
+category.delete('/delete', async (req,res) => {
+	const {categoryID,userID} = req.body;
+
+	const validationResult = await validateDeleteCategory(categoryID,userID);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
+
 	db('tb_blog_category')
-	.where('blog_category_id', blog_category_id)
+	.where('blog_category_id', categoryID)
+	.andWhere('user_id',userID)
 	.del()
 	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error delete category'));
+	.catch( ()=>(res.status(500).send({ 
+		Code: INTERNAL_SERVER_ERROR_CATEGORY_DELETE,
+		errMessage: 'Internal Server Error, please try again' 
+	})));
 });
 
 category.post('/search', (req,res) => {

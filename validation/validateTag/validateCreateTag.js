@@ -1,17 +1,29 @@
 
 const { isTagMandatoryFieldNotFilled } = require('./isTagMandatoryFieldNotFilled');
 const { isCreateTagNameDuplicate } = require('./isCreateTagNameDuplicate');
+const { isTagNameLengthValid } = require('./isTagNameLengthValid');
+const { isTagSeqValidNumber } = require('./isTagSeqValidNumber');
 const {
     TAG_MANDATORY_FIELD,
     TAG_DUPLICATE_TAG_NAME,
+    TAG_NAME_INVALID_LENGTH,
+    TAG_SEQ_INVALID_NUMBER,
     INTERNAL_SERVER_ERROR_TAG_CHECK_DUP
 } = require('../validationConstants');
 
 module.exports = {
     validateCreateTag: async function (tagName, tagSeq, userID) {
-        //frontend supposed to guard this, just in case someone hack the js in frontend
+        //frontend also check
         if (isTagMandatoryFieldNotFilled(tagName,tagSeq)) {
             return ({ Status:400, Code: TAG_MANDATORY_FIELD, errMessage: 'Tag Name and Seq is Mandatory' });
+        }
+        //frontend also check
+        if (isTagNameLengthValid(tagName)) {
+            return ({ Status:400, Code: TAG_NAME_INVALID_LENGTH, errMessage: 'Tag Name cannot be more than 20 characters' });
+        }
+        //frontend also check
+        if (isTagSeqValidNumber(tagSeq)) {
+            return ({ Status:400, Code: TAG_SEQ_INVALID_NUMBER, errMessage: 'Seq must be between 0 to 1000' });
         }
 
         const isTagNameDuplicateResult = await isCreateTagNameDuplicate(tagName,userID);

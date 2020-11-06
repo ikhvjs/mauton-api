@@ -62,7 +62,7 @@ tag.post('/create', async (req,res) => {
 tag.delete('/delete', async (req,res) => {
 	const {tagID, userID} = req.body;
 
-	const validationResult = await validateDeleteTag(tagID,userID);
+	const validationResult = await validateDeleteTag(tagID);
 
 	if (await validationResult.Status !== 200){
 		return res.status(validationResult.Status).send({
