@@ -1,7 +1,9 @@
 const db = require('../database')
 const express = require('express');
 const menu1 = express.Router();
-const {  INTERNAL_SERVER_ERROR_MENU1_REQUEST
+const {  
+	INTERNAL_SERVER_ERROR_MENU1_REQUEST,
+	INTERNAL_SERVER_ERROR_MENU1_SEARCH
 }  = require('../validation/validationConstants');
 
 menu1.post('/request', (req,res) => {
@@ -44,16 +46,20 @@ menu1.delete('/delete', (req,res) => {
 	.catch(err => res.status(400).json('error delete menu1'));
 });
 menu1.post('/search', (req,res) => {
-	const{menu_name,menu_path} = req.body;
+	const{menuName,userID} = req.body;
+	
 	db.orderBy('menu_id','desc')
-	.select('menu_id','menu_name'
-		,'menu_path','seq')
+	.select('menu_id','menu_name','seq')
 	.from('tb_menu')
-	.where('menu_name','~*',menu_name)
-	.andWhere('menu_path','~*',menu_path)
+	.where('menu_name','~*',menuName)
 	.andWhere('menu_level','=',1)
-	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error search menu1'));
+	.andWhere('user_id','=',userID)
+	.then(menu=>res.status(200).json(menu))
+	.catch( ()=> (res.status(500).send({ 
+			Code: INTERNAL_SERVER_ERROR_MENU1_SEARCH,
+			errMessage: 'Internal Server Error, please try again' 
+		}))
+	);
 });
 menu1.put('/update', (req,res) => {
 	const{menu_id,menu_name,menu_path,seq} = req.body;
