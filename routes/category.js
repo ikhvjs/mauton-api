@@ -3,10 +3,12 @@ const express = require('express');
 const category = express.Router();
 const { validateCreateCategory } = require('../validation/validateCategory/validateCreateCategory'); 
 const { validateDeleteCategory } = require('../validation/validateCategory/validateDeleteCategory'); 
+const { validateUpdateCategory } = require('../validation/validateCategory/validateUpdateCategory'); 
 const {	INTERNAL_SERVER_ERROR_CATEGORY_REQUEST,
 		INTERNAL_SERVER_ERROR_CATEGORY_SEARCH,
 		INTERNAL_SERVER_ERROR_CATEGORY_CREATE,
-		INTERNAL_SERVER_ERROR_CATEGORY_DELETE
+		INTERNAL_SERVER_ERROR_CATEGORY_DELETE,
+		INTERNAL_SERVER_ERROR_CATEGORY_UPDATE
 }  = require('../validation/validationConstants');
 
 category.post('/request', (req,res) => {
@@ -93,90 +95,39 @@ category.post('/search', (req,res) => {
 	})));
 });
 
-category.put('/update', (req,res) => {
-	const{blog_category_id,blog_category_name,blog_category_desc,seq} = req.body;
+category.put('/update', async (req,res) => {
+	const{categoryID,categoryName,categoryDesc,seq,userID} = req.body;
+	
+	const validationResult 
+		= await validateUpdateCategory(categoryID,
+										categoryName,
+										categoryDesc,
+										seq,
+										userID);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
+
 	db('tb_blog_category')
-	.where('blog_category_id', '=', blog_category_id)
+	.where('blog_category_id', '=', categoryID)
 	.update({
-		blog_category_name: blog_category_name,
-		blog_category_desc: blog_category_desc,
+		blog_category_name: categoryName,
+		blog_category_desc: categoryDesc,
 		seq:seq,
 		last_updated_date:new Date(),
-		last_updated_by:'testingUser1'
+		last_updated_by:userID
 	})
-	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error update category'))
+	.then(result=>{
+		res.status(200).json(result);
+	})
+	.catch( ()=>(res.status(500).send({ 
+		Code: INTERNAL_SERVER_ERROR_CATEGORY_UPDATE,
+		errMessage: 'Internal Server Error, please try again' 
+	})));
 });
 
 module.exports = category;
-
-// const handleCategoryGet =(req,res,db)=>{
-// 	db.orderBy('blog_category_id','desc')
-// 	.select('blog_category_id','blog_category_name','blog_category_desc','seq')
-// 	.from('tb_blog_category')
-// 	.then(categories=>res.json(categories))
-// 	.catch(err => res.status(400).json('error getting category'));
-// }
-
-// const handleCategoryPost =(req,res,db)=>{
-//   const {blog_category_name, blog_category_desc, seq} = req.body;
-//   // console.log('req.body',req.body);
-//   db('tb_blog_category')
-//   .returning(['blog_category_id','blog_category_name','blog_category_desc','seq'])
-//   .insert({
-//     blog_category_name: blog_category_name,
-//     blog_category_desc:blog_category_desc,
-//     seq:seq,
-//     created_date:new Date(),
-//     created_by:'testingUser1',
-//     last_updated_date:new Date(),
-//     last_updated_by:'testingUser1'
-//   })
-//   .then(data=>res.json(data))
-//   .catch(err => res.status(400).json('error creating category'));
-// }
-
-// const handleCategoryDelete=(req,res,db)=>{
-// 	const {blog_category_id} = req.body;
-// 	db('tb_blog_category')
-// 	.where('blog_category_id', blog_category_id)
-// 	.del()
-// 	.then(data=>res.json(data))
-// 	.catch(err => res.status(400).json('error delete category'));
-// }
-
-// const handleCategorySearch=(req,res,db)=>{
-// 	const{blog_category_name,blog_category_desc} = req.body;
-// 	db.orderBy('blog_category_id','desc')
-// 	.select('blog_category_id','blog_category_name'
-// 		,'blog_category_desc','seq')
-// 	.from('tb_blog_category')
-// 	.where('blog_category_name','~*',blog_category_name)
-// 	.andWhere('blog_category_desc','~*',blog_category_desc)
-// 	.then(data=>res.json(data))
-// 	.catch(err => res.status(400).json('error search category'));
-// }
-
-// const handleCategoryUpdate=(req,res,db)=>{
-// 	const{blog_category_id,blog_category_name,blog_category_desc,seq} = req.body;
-// 	db('tb_blog_category')
-// 	.where('blog_category_id', '=', blog_category_id)
-// 	.update({
-// 		blog_category_name: blog_category_name,
-// 		blog_category_desc: blog_category_desc,
-// 		seq:seq,
-// 		last_updated_date:new Date(),
-// 		last_updated_by:'testingUser1'
-// 	})
-// 	.then(data=>res.json(data))
-// 	.catch(err => res.status(400).json('error update category'))
-// }
-
-
-// module.exports = {
-//   handleCategoryGet,
-//   handleCategoryPost,
-//   handleCategoryDelete,
-//   handleCategorySearch,
-//   handleCategoryUpdate
-// }

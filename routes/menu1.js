@@ -1,14 +1,22 @@
 const db = require('../database')
 const express = require('express');
 const menu1 = express.Router();
+const {  INTERNAL_SERVER_ERROR_MENU1_REQUEST
+}  = require('../validation/validationConstants');
 
-menu1.get('/get', (req,res) => {
+menu1.post('/request', (req,res) => {
+	const {userID} = req.body;
 	db.orderBy('menu_id','desc')
-	.	select('menu_name','seq','menu_path','menu_id')
+	.select('menu_name','seq','menu_id')
 	.from('tb_menu')
-	.where({menu_level:1})
-	.then(menu=>res.json(menu))
-	.catch(err => res.status(400).json('error getting menu1')); 
+	.where({menu_level:1,
+			user_id:userID
+	})
+	.then(menu=>res.status(200).json(menu))
+	.catch(() => res.status(500).json(
+		{Code:INTERNAL_SERVER_ERROR_MENU1_REQUEST,
+			errMessage:'Internal Server Error, please click Search button to try again'})
+	);
 });
 menu1.post('/create', (req,res) => {
 	const {menu_name, menu_path, seq} = req.body;

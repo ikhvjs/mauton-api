@@ -18,11 +18,11 @@ module.exports = {
             return ({ Status:400, Code: TAG_MANDATORY_FIELD, errMessage: 'Tag Name and Seq is Mandatory' });
         }
         //frontend also check
-        if (isTagNameLengthValid(tagName)) {
+        if (!isTagNameLengthValid(tagName)) {
             return ({ Status:400, Code: TAG_NAME_INVALID_LENGTH, errMessage: 'Tag Name cannot be more than 20 characters' });
         }
         //frontend also check
-        if (isTagSeqValidNumber(tagSeq)) {
+        if (!isTagSeqValidNumber(tagSeq)) {
             return ({ Status:400, Code: TAG_SEQ_INVALID_NUMBER, errMessage: 'Seq must be between 0 to 1000' });
         }
 

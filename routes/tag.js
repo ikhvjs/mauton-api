@@ -17,7 +17,7 @@ tag.post('/request', (req,res) => {
 	.select('tag_id','tag_name','seq')
 	.from('tb_tag')
 	.where('user_id', userID)
-	.then(tags=>res.json(tags))
+	.then(tags=>res.status(200).json(tags))
 	.catch(() => res.status(500).json(
 		{Code:INTERNAL_SERVER_ERROR_TAG_REQUEST,
 			errMessage:'Internal Server Error, please click Search button to try again'})
@@ -122,8 +122,6 @@ tag.put('/update', async (req,res) => {
 		Code: INTERNAL_SERVER_ERROR_TAG_UPDATE,
 		errMessage: 'Internal Server Error, please try again' 
 	})));
-	// .then(data=>res.json(data))
-	// .catch(err => res.status(400).json('error update tag'))
 });
 
 module.exports = tag
