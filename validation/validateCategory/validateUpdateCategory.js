@@ -28,7 +28,7 @@ module.exports = {
         }
 
         if (!isCategorySeqValidNumber(categorySeq)) {
-            return ({ Status:400, Code: CATEGORY_SEQ_INVALID_NUMBER, errMessage: 'Seq must be between 0 to 1000' });
+            return ({ Status:400, Code: CATEGORY_SEQ_INVALID_NUMBER, errMessage: 'Seq must be between 1 to 1000' });
         }
 
         const isCategoryNameDuplicateResult = await isUpdateCategoryNameDuplicate(categoryName,userID,categoryID);

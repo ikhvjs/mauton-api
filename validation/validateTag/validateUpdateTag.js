@@ -23,7 +23,7 @@ module.exports = {
         }
 
         if (!isTagSeqValidNumber(tagSeq)) {
-            return ({ Status:400, Code: TAG_SEQ_INVALID_NUMBER, errMessage: 'Seq must be between 0 to 1000' });
+            return ({ Status:400, Code: TAG_SEQ_INVALID_NUMBER, errMessage: 'Seq must be between 1 to 1000' });
         }
 
         const isTagNameDuplicateResult = await isUpdateTagNameDuplicate(tagName,userID,tagID);

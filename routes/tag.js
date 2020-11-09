@@ -75,7 +75,7 @@ tag.delete('/delete', async (req,res) => {
 	.where('tag_id', tagID)
 	.andWhere('user_id',userID)
 	.del()
-	.then(data=>res.json(data))
+	.then(data=>res.status(200).json(data))
 	.catch( ()=>(res.status(500).send({ 
 		Code: INTERNAL_SERVER_ERROR_TAG_DELETE,
 		errMessage: 'Internal Server Error, please try again' 

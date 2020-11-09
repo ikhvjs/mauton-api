@@ -1,9 +1,15 @@
 const db = require('../database')
 const express = require('express');
+const { validateCreateMenu1 } = require('../validation/validateMenu1/validateCreateMenu1'); 
+const { validateDeleteMenu1 } = require('../validation/validateMenu1/validateDeleteMenu1'); 
+const { validateUpdateMenu1 } = require('../validation/validateMenu1/validateUpdateMenu1'); 
 const menu1 = express.Router();
 const {  
 	INTERNAL_SERVER_ERROR_MENU1_REQUEST,
-	INTERNAL_SERVER_ERROR_MENU1_SEARCH
+	INTERNAL_SERVER_ERROR_MENU1_SEARCH,
+	INTERNAL_SERVER_ERROR_MENU1_INSERT,
+	INTERNAL_SERVER_ERROR_MENU1_DELETE,
+	INTERNAL_SERVER_ERROR_MENU1_UPDATE
 }  = require('../validation/validationConstants');
 
 menu1.post('/request', (req,res) => {
@@ -20,30 +26,60 @@ menu1.post('/request', (req,res) => {
 			errMessage:'Internal Server Error, please click Search button to try again'})
 	);
 });
-menu1.post('/create', (req,res) => {
-	const {menu_name, menu_path, seq} = req.body;
+menu1.post('/create', async (req,res) => {
+	const {menu1Name,seq,userID} = req.body;
+
+	const validationResult = await validateCreateMenu1(menu1Name,seq,userID);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
+
   	db('tb_menu')
-  	.returning(['menu_id','menu_name','menu_path','seq'])
   	.insert({
 	  	menu_level: 1,
-	    menu_name: menu_name,
-	    menu_path: menu_path,
-	    seq:seq,
+	    menu_name: menu1Name,
+		seq:seq,
+		user_id:userID,
 	    created_date:new Date(),
-	    created_by:'testingUser1',
+	    created_by:userID,
 	    last_updated_date:new Date(),
-	    last_updated_by:'testingUser1'
+	    last_updated_by:userID
   	})
-  	.then(data=>res.json(data))
-  	.catch(err => res.status(400).json(err));
+	  .then(result=>{
+		res.status(200).json(`command:${result.command},rowCount:${result.rowCount}`);
+	})
+	.catch( ()=>(
+		res.status(500).send({ 
+			Code: INTERNAL_SERVER_ERROR_MENU1_INSERT,
+			errMessage: 'Internal Server Error, please try again' 
+		})
+	));
 });
-menu1.delete('/delete', (req,res) => {
-	const {menu_id} = req.body;
+menu1.delete('/delete', async (req,res) => {
+	const {menu1ID, userID} = req.body;
+
+	const validationResult = await validateDeleteMenu1(menu1ID);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
+
 	db('tb_menu')
-	.where('menu_id', menu_id)
+	.where('menu_id', menu1ID)
+	.andWhere('user_id',userID)
 	.del()
-	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error delete menu1'));
+	.then(data=>res.status(200).json(data))
+	.catch( ()=>(res.status(500).send({ 
+		Code: INTERNAL_SERVER_ERROR_MENU1_DELETE,
+		errMessage: 'Internal Server Error, please try again' 
+	})));
 });
 menu1.post('/search', (req,res) => {
 	const{menuName,userID} = req.body;
@@ -61,19 +97,34 @@ menu1.post('/search', (req,res) => {
 		}))
 	);
 });
-menu1.put('/update', (req,res) => {
-	const{menu_id,menu_name,menu_path,seq} = req.body;
+menu1.put('/update', async (req,res) => {
+	const {menu1ID,menu1Name,seq,userID} = req.body;
+
+	const validationResult = await validateUpdateMenu1(menu1ID,menu1Name,seq,userID);
+
+	if (await validationResult.Status !== 200){
+		return res.status(validationResult.Status).send({
+			Code:validationResult.Code,
+			errMessage:validationResult.errMessage
+		});
+	}
 	db('tb_menu')
-	.where('menu_id', '=', menu_id)
+	.where('menu_id', '=', menu1ID)
+	.andWhere('user_id','=', userID)
 	.update({
-		menu_name: menu_name,
-		menu_path: menu_path,
+		menu_name: menu1Name,
 		seq:seq,
+		user_id:userID,
 		last_updated_date:new Date(),
-		last_updated_by:'testingUser1'
+		last_updated_by:userID
 	})
-	.then(data=>res.json(data))
-	.catch(err => res.status(400).json('error update menu1'))
+	.then(result=>{
+		res.status(200).json(result);
+	})
+	.catch( ()=>(res.status(500).send({ 
+		Code: INTERNAL_SERVER_ERROR_MENU1_UPDATE,
+		errMessage: 'Internal Server Error, please try again' 
+	})));
 });
 
 module.exports = menu1;
