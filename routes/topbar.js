@@ -1,22 +1,21 @@
 const db = require('../database')
 const express = require('express');
 const topbar = express.Router();
+const {  INTERNAL_SERVER_ERROR_TOPBAR_REQUEST
+}  = require('../validation/validationConstants');
 
-topbar.post('/', (req,res) => {
-	// const {menu_name, menu_path, seq} = req.user;
-	db.select('menu_name','seq','menu_path','menu_id')
+topbar.post('/request', (req,res) => {
+	const {userID} = req.body;
+	db.orderBy('seq','asc')
+	.select('menu_name','seq','menu_path','menu_id')
 	.from('tb_menu')
-	.where({menu_level:1})
-	.then(menu=>res.json(menu))
-	.catch(err => res.status(400).json('error getting topbar menu')); 
+	.where({menu_level:1,
+			user_id:userID})
+	.then(result=>res.status(200).json(result))
+	.catch(() => res.status(500).json(
+		{Code:INTERNAL_SERVER_ERROR_TOPBAR_REQUEST,
+			errMessage:'Internal Server Error, please try again'})
+	);
 });
-
-// const handleTopbarGet = (req,res,db) => {
-// 	db.select('menu_name','seq','menu_path','menu_id')
-// 	.from('tb_menu')
-// 	.where({menu_level:1})
-// 	.then(menu=>res.json(menu))
-// 	.catch(err => res.status(400).json('error getting topbar menu')); 
-// }
 
 module.exports = topbar;
