@@ -6,7 +6,8 @@ const {  INTERNAL_SERVER_ERROR_SIDEBAR_REQUEST
 
 sidebar.post('/request', (req,res) => {
 	const { topbarMenuID,userID } = req.body;
-	db.select('menu_name',
+	db.orderBy('seq','asc')
+	.select('menu_name',
 			'menu_id')
 	.from('tb_menu')
 	.where({parent_menu_id:topbarMenuID,
