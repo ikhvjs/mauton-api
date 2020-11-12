@@ -5,9 +5,9 @@ const {
 } = require('../validationConstants');
 
 module.exports = {
-    validateDeleteMenu1: async function (tagID) {
+    validateDeleteMenu1: async function (menu1ID) {
         
-        const isMenu1ForeignKeyExistResult = await isMenu1ForeignKeyExist(tagID);
+        const isMenu1ForeignKeyExistResult = await isMenu1ForeignKeyExist(menu1ID);
         if (typeof(isMenu1ForeignKeyExistResult) !== "boolean") {
             return({ Status:500, Code: INTERNAL_SERVER_ERROR_MENU1_CHECK_FOREIGN_KEY, errMessage: 'Internal Server Error, please try again' });
         }else{
