@@ -123,7 +123,7 @@ menu2.post('/search', (req, res) => {
 });
 menu2.put('/update', async (req, res) => {
 	const { menu2ID, menu2Name, menu2ParentMenuID, seq, userID } = req.body;
-	
+
 	const validationResult = await validateUpdateMenu2(menu2ID,
 		menu2Name,
 		menu2ParentMenuID,

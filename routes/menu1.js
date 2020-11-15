@@ -89,7 +89,7 @@ menu1.post('/search', (req, res) => {
 
 	db.orderBy('menu_id', 'desc')
 		.select('menu_id', 'menu_name', 'seq')
-		.from('tb_menu')
+		.from('tb_menus')
 		.where('menu_name', '~*', menuName)
 		.andWhere('menu_level', '=', 1)
 		.andWhere('user_id', '=', userID)
