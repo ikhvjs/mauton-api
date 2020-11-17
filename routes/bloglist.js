@@ -58,9 +58,9 @@ bloglist.post('/request', (req, res) => {
 
 bloglist.post('/search', (req, res) => {
 	const { blogTitle, categoryName, tagName, menuID, userID } = req.body;
-	// console.table(req.body)
 
 	db.groupByRaw('1,2,3,4,5')
+		.orderBy('tb.seq','asc')
 		.select('tb.blog_id',
 			'tb.blog_title',
 			'tb.blog_content',
@@ -83,6 +83,30 @@ bloglist.post('/search', (req, res) => {
 		.join('tb_menu as tm', function () {
 			this.on('tm.menu_id', '=', 'tb.menu_id')
 				.andOn('tm.menu_id', '=', db.raw('?', [menuID]))
+		})
+		.then(blogs => {
+			// console.log('blogs',blogs);
+
+			const promises = blogs.map((blog) => {
+				// console.log('blog',blog);
+				return db.select(
+					'tt.tag_id',
+					'tt.tag_name')
+					.from('tb_tag as tt')
+					.join('tb_blog_tag_link as tbtl', function () {
+						this.on('tbtl.blog_id', '=', blog.blog_id)
+							.andOn('tbtl.tag_id', '=', 'tt.tag_id')
+							.andOn('tt.tag_name', '~*', db.raw('?', [tagName]))
+					})
+					.then(tags => {
+						// console.log('tags',tags);
+						Object.assign(blog, { tags: [...tags] })
+						return blog;
+					})
+					;
+			});
+
+			return Promise.all(promises);
 		})
 		.then(blogs => res.status(200).json(blogs))
 		.catch((err) => {
