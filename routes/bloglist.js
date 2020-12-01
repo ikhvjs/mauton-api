@@ -10,8 +10,8 @@ bloglist.post('/request', (req, res) => {
 	const { menu2ID, userID } = req.body;
 
 	// console.table(req.body);
-
-	db.select('tb.blog_id',
+	db.orderBy('seq','asc')
+		.select('tb.blog_id',
 		'tb.blog_title',
 		'tb.seq',
 		'bc.blog_category_name',
