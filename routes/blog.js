@@ -158,9 +158,9 @@ blog.post('/create', async (req, res) => {
 				})
 				return Promise.all(promises);
 			})
-			.then(result => {
+			.then(() => {
 				// console.log({ result });
-				res.status(200).json(`command:${result.command},rowCount:${result.rowCount}`);
+				res.status(200).json(`created blog successfully`);
 			})
 			.then(trx.commit)
 			.catch(trx.rollback)
@@ -175,44 +175,38 @@ blog.post('/create', async (req, res) => {
 		}
 		);
 });
-blog.put('/update', (req, res) => {
-	const { updateBlog } = req.body;
-	console.log('updateBlog', updateBlog);
-
+blog.put('/update', async (req, res) => {
+	const { blogID, blogTitle, blogCategoryID, blogTag, blogSeq, blogContent, userID, sidebarMenuID } = req.body;
 
 	db.transaction(trx => {
 		trx('tb_blog')
-			.where({ blog_id: updateBlog.blog_id })
+			.where({ blog_id: blogID })
 			.update({
-				blog_title: updateBlog.blog_title,
-				blog_desc: updateBlog.blog_desc,
-				blog_path: updateBlog.blog_path,
-				blog_category_id: updateBlog.blog_category_id,
-				seq: updateBlog.seq,
-				blog_content: updateBlog.blog_content,
+				blog_title: blogTitle,
+				blog_category_id: blogCategoryID,
+				seq: blogSeq,
+				blog_content: blogContent,
+				user_id: userID,
 				last_updated_date: new Date(),
-				last_updated_by: 'testingUser1'
+				last_updated_by: userID
 			}, ['blog_id'])
-			.then(data => {
-				let blog_id = data[0].blog_id;
-				// console.log('blog_id',blog_id);
+			.then(() => {
 				return trx('tb_blog_tag_link')
-					.where('blog_id', blog_id)
+					.where('blog_id', blogID)
 					.del()
 			})
-			.then(data => {
-				// console.log('deleted row', data)
-				const promises = updateBlog.tags.map((tag) => {
+			.then(() => {
+				const promises = blogTag.map((tag) => {
 					// console.log('tag',tag);
 					return trx('tb_blog_tag_link')
 						.returning('blog_tag_link_id')
 						.insert({
-							blog_id: updateBlog.blog_id,
+							blog_id: blogID,
 							tag_id: tag.tag_id,
 							created_date: new Date(),
-							created_by: 'testingUser1',
+							created_by: userID,
 							last_updated_date: new Date(),
-							last_updated_by: 'testingUser1'
+							last_updated_by: userID
 						})
 						.then(data => {
 							return data[0];
@@ -222,15 +216,22 @@ blog.put('/update', (req, res) => {
 				return Promise.all(promises);
 
 			})
-			.then(data => {
+			.then(() => {
 				// console.log('data',data);
-				res.json(data);
+				res.status(200).json(`updated blog successfully`);
 			})
 			.then(trx.commit)
 			.catch(trx.rollback)
 
 	})
-		.catch(err => res.status(400).json(err))
+		.catch((err) => {
+			console.log(err);
+			(res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_BLOG_UPDATE,
+				errMessage: 'Internal Server Error, please try again'
+			}));
+		}
+		);
 });
 blog.delete('/delete', (req, res) => {
 	const { blogID, userID } = req.body;
