@@ -11,9 +11,6 @@ const register = express.Router();
 register.post('/', async (req,res) => {
 	const { email, password, username, captchaToken } = req.body;
 	const validationResult = await validateRegister(email,password,username,captchaToken);
-	
-	console.log('body',req.body);
-	// console.log('validationResult',await validationResult);
 
 	if (await validationResult.Code !== NO_ERROR){
 		return res.status(400).send(validationResult);
