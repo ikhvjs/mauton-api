@@ -32,7 +32,7 @@ module.exports = {
         }
 
         if(!isValidUsername(username)){
-            return ({ Code: REG_INVALID_USERNAME, errMessage: 'Username is invalid. Only accept English(Lower Case) and Numbers'});
+            return ({ Code: REG_INVALID_USERNAME, errMessage: 'Username is invalid. Max. Characters is 15 and Only accept English and Numbers'});
         }
 
         if(!isValidPassword(password)){

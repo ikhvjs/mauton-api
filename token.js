@@ -64,7 +64,8 @@ function createToken(user){
         scope: user.user_role,
         info: {
 			userID: user.user_id,
-			userName: user.user_name
+			userName: user.user_name,
+			userEmail: user.email,
     	}
 	});
 }
