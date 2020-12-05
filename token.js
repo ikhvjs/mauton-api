@@ -25,7 +25,7 @@ function verifyToken (req, res, next) {
 	                        break;
 	                }
 	            } else {
-	            	// console.log('decoded',decoded);
+	            	// console.log({decoded});
 	                req.user = decoded;                    
 	            }
         	});
@@ -41,7 +41,7 @@ function verifyToken (req, res, next) {
 
 function createToken(user){
 	let payload = {
-            iss: user.user_id,
+			userID: user.user_id,
             sub: 'Mauton Web API',
             role: user.user_role
     };

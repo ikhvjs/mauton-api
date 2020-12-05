@@ -1,6 +1,4 @@
 const routing =(app)=>{
-	//For testing purpose
-	app.get('/',(req, res)=>res.json('Hello World'));
 	//Topbar
 	app.use('/topbar',require('./routes/topbar'));
 	//Sidebar

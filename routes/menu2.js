@@ -13,7 +13,7 @@ const {
 } = require('../validation/validationConstants');
 
 menu2.post('/request', (req, res) => {
-	const { userID } = req.body;
+	const { userID } = req.user;
 
 	db.orderBy('tm1.menu_id', 'desc')
 		.select('tm1.menu_id',
@@ -39,8 +39,8 @@ menu2.post('/request', (req, res) => {
 });
 
 menu2.post('/create', async (req, res) => {
-	const { menu2Name, seq, menu2ParentMenuID, userID } = req.body;
-
+	const { menu2Name, seq, menu2ParentMenuID } = req.body;
+	const { userID } = req.user;
 	const validationResult = await validateCreateMenu2(menu2Name, seq, menu2ParentMenuID, userID);
 
 	if (await validationResult.Status !== 200) {
@@ -73,8 +73,8 @@ menu2.post('/create', async (req, res) => {
 		));
 });
 menu2.delete('/delete', async (req, res) => {
-	const { menu2ID, userID } = req.body;
-
+	const { menu2ID } = req.body;
+	const { userID } = req.user;
 	const validationResult = await validateDeleteMenu2(menu2ID, userID);
 
 	if (await validationResult.Status !== 200) {
@@ -96,8 +96,8 @@ menu2.delete('/delete', async (req, res) => {
 		);
 });
 menu2.post('/search', (req, res) => {
-	const { menuName, parentMenuName, userID } = req.body;
-
+	const { menuName, parentMenuName } = req.body;
+	const { userID } = req.user;
 	db.orderBy('tm1.menu_id', 'desc')
 		.select('tm1.menu_id',
 			'tm1.menu_name',
@@ -122,8 +122,8 @@ menu2.post('/search', (req, res) => {
 		);
 });
 menu2.put('/update', async (req, res) => {
-	const { menu2ID, menu2Name, menu2ParentMenuID, seq, userID } = req.body;
-
+	const { menu2ID, menu2Name, menu2ParentMenuID, seq } = req.body;
+	const { userID } = req.user;
 	const validationResult = await validateUpdateMenu2(menu2ID,
 		menu2Name,
 		menu2ParentMenuID,

@@ -12,7 +12,8 @@ const { INTERNAL_SERVER_ERROR_BLOG_INSERT,
 
 
 blog.post('/request', (req, res) => {
-	const { userID, blogID } = req.body;
+	const { blogID } = req.body;
+	const { userID } = req.user;
 
 	db.select('tb.blog_id',
 		'tb.blog_title',
@@ -55,8 +56,8 @@ blog.post('/request', (req, res) => {
 		);
 });
 blog.post('/create', async (req, res) => {
-	const { blogTitle, blogCategoryID, blogTag, blogSeq, blogContent, userID, sidebarMenuID } = req.body;
-
+	const { blogTitle, blogCategoryID, blogTag, blogSeq, blogContent,  sidebarMenuID } = req.body;
+	const { userID } = req.user;
 	const validationResult = await validateCreateBlog(blogTitle,
 		blogCategoryID,
 		blogTag,
@@ -127,7 +128,8 @@ blog.post('/create', async (req, res) => {
 		);
 });
 blog.put('/update', async (req, res) => {
-	const { blogID, blogTitle, blogCategoryID, blogTag, blogSeq, blogContent, userID, sidebarMenuID } = req.body;
+	const { blogID, blogTitle, blogCategoryID, blogTag, blogSeq, blogContent, sidebarMenuID } = req.body;
+	const { userID } = req.user;
 	const validationResult = await validateUpdateBlog(
 													blogID,
 													blogTitle,
@@ -199,9 +201,8 @@ blog.put('/update', async (req, res) => {
 		);
 });
 blog.delete('/delete', (req, res) => {
-	const { blogID, userID } = req.body;
-
-
+	const { blogID } = req.body;
+	const { userID } = req.user;
 
 	db.transaction(trx => {
 		trx('tb_blog_tag_link')

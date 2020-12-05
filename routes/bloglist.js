@@ -7,8 +7,8 @@ const {
 } = require('../validation/validationConstants');
 
 bloglist.post('/request', (req, res) => {
-	const { menu2ID, userID } = req.body;
-
+	const { menu2ID } = req.body;
+	const { userID } = req.user;
 	// console.table(req.body);
 	db.orderBy('seq','asc')
 		.select('tb.blog_id',
@@ -57,8 +57,8 @@ bloglist.post('/request', (req, res) => {
 });
 
 bloglist.post('/search', (req, res) => {
-	const { blogTitle, categoryName, tagName, menuID, userID } = req.body;
-
+	const { blogTitle, categoryName, tagName, menuID } = req.body;
+	const { userID } = req.user;
 	db.groupByRaw('1,2,3,4,5')
 		.orderBy('tb.seq','asc')
 		.select('tb.blog_id',

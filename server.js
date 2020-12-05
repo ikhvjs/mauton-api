@@ -9,6 +9,9 @@ const app = express();
 //Middleware
 middleware(app);
 
+//For testing purpose
+app.get('/',(req, res)=>res.json('Hello World'));
+  
 //register
 app.use('/register', require('./routes/register'));
 
