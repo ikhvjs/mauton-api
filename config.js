@@ -3,9 +3,9 @@ const env = process.env.NODE_ENV || "dev"
 const configs = {
     base: {
         env,
-        tokenExpiredTime : 2000, //in seconds
-		secret: "gklskdfj@KJFLGksjgPosj&hgjs1kjfj3SG9491f",
-		captchaSecret: "6LcqXdgZAAAAAD3WH0cQ8Xz8q0NKU96zbYgYTxVa",
+        tokenExpiredTime : process.env.TOKEN_EXPIRY_TIME, //in seconds
+		secret: process.env.TOKEN_KEY,
+		captchaSecret: process.env.CAPTCHA_KEY,
     },
     dev: {
     	port:3001,
