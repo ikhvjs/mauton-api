@@ -29,8 +29,6 @@ blog.post('/request', (req, res) => {
 				.andOn('tb.user_id', '=', db.raw('?', [userID]))
 		})
 		.then(blog => {
-			// console.log('blog',blog[0]);
-
 			return db.select(
 				'tt.tag_id',
 				'tt.tag_name')
@@ -40,7 +38,6 @@ blog.post('/request', (req, res) => {
 						.andOn('tbtl.tag_id', '=', 'tt.tag_id')
 				})
 				.then(tags => {
-					// console.log('tags',tags);
 					Object.assign(blog[0], { tags: [...tags] })
 					return blog;
 				})
@@ -48,15 +45,17 @@ blog.post('/request', (req, res) => {
 
 		})
 		.then(blog => res.status(200).json(blog[0]))
-		.catch(() => res.status(500).json(
-			{
-				Code: INTERNAL_SERVER_ERROR_BLOG_REQUEST,
-				errMessage: 'Internal Server Error, please try again'
-			})
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json(
+				{
+					Code: INTERNAL_SERVER_ERROR_BLOG_REQUEST,
+					errMessage: 'Internal Server Error, please try again'
+				});
+		});
 });
 blog.post('/create', async (req, res) => {
-	const { blogTitle, blogCategoryID, blogTag, blogSeq, blogContent,  sidebarMenuID } = req.body;
+	const { blogTitle, blogCategoryID, blogTag, blogSeq, blogContent, sidebarMenuID } = req.body;
 	const { userID } = req.user;
 	const validationResult = await validateCreateBlog(blogTitle,
 		blogCategoryID,
@@ -88,10 +87,7 @@ blog.post('/create', async (req, res) => {
 				last_updated_by: userID
 			})
 			.then(data => {
-				// console.log('blog_id',blog_id[0]);
-
 				const promises = blogTag.map((tag) => {
-					// console.log('tag',tag);
 					return trx('tb_blog_tag_link')
 						.returning('blog_tag_link_id')
 						.insert({
@@ -103,7 +99,6 @@ blog.post('/create', async (req, res) => {
 							last_updated_by: userID
 						})
 						.then(data => {
-							// console.log('tag_link_id',tag_link_id[0]);
 							return data[0];
 						})
 
@@ -111,7 +106,6 @@ blog.post('/create', async (req, res) => {
 				return Promise.all(promises);
 			})
 			.then(() => {
-				// console.log({ result });
 				res.status(200).json(`created blog successfully`);
 			})
 			.then(trx.commit)
@@ -131,13 +125,13 @@ blog.put('/update', async (req, res) => {
 	const { blogID, blogTitle, blogCategoryID, blogTag, blogSeq, blogContent, sidebarMenuID } = req.body;
 	const { userID } = req.user;
 	const validationResult = await validateUpdateBlog(
-													blogID,
-													blogTitle,
-													blogCategoryID,
-													blogTag,
-													blogSeq,
-													userID,
-													sidebarMenuID);
+		blogID,
+		blogTitle,
+		blogCategoryID,
+		blogTag,
+		blogSeq,
+		userID,
+		sidebarMenuID);
 
 	if (await validationResult.Status !== 200) {
 		return res.status(validationResult.Status).send({
@@ -164,7 +158,6 @@ blog.put('/update', async (req, res) => {
 			})
 			.then(() => {
 				const promises = blogTag.map((tag) => {
-					// console.log('tag',tag);
 					return trx('tb_blog_tag_link')
 						.returning('blog_tag_link_id')
 						.insert({
@@ -184,7 +177,6 @@ blog.put('/update', async (req, res) => {
 
 			})
 			.then(() => {
-				// console.log('data',data);
 				res.status(200).json(`updated blog successfully`);
 			})
 			.then(trx.commit)
@@ -223,11 +215,13 @@ blog.delete('/delete', (req, res) => {
 			.catch(trx.rollback)
 
 	})
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_BLOG_DELETE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_BLOG_DELETE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
-
 
 module.exports = blog;

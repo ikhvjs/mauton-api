@@ -19,12 +19,14 @@ category.post('/request', (req, res) => {
 		.from('tb_blog_category')
 		.where('user_id', userID)
 		.then(ctgs => res.status(200).json(ctgs))
-		.catch(() => res.status(500).json(
-			{
-				Code: INTERNAL_SERVER_ERROR_CATEGORY_REQUEST,
-				errMessage: 'Internal Server Error, please click Search button to try again'
-			})
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json(
+				{
+					Code: INTERNAL_SERVER_ERROR_CATEGORY_REQUEST,
+					errMessage: 'Internal Server Error, please click Search button to try again'
+				});
+		});
 });
 
 category.post('/create', async (req, res) => {
@@ -40,7 +42,6 @@ category.post('/create', async (req, res) => {
 	}
 
 	db('tb_blog_category')
-		// .returning(['blog_category_id','blog_category_name','blog_category_desc','seq'])
 		.insert({
 			blog_category_name: categoryName,
 			blog_category_desc: categoryDesc,
@@ -52,12 +53,14 @@ category.post('/create', async (req, res) => {
 			last_updated_by: userID
 		})
 		.then(result => res.json(`command:${result.command},rowCount:${result.rowCount}`))
-		.catch(() => res.status(500).json(
-			{
-				Code: INTERNAL_SERVER_ERROR_CATEGORY_CREATE,
-				errMessage: 'Internal Server Error, please try again'
-			})
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json(
+				{
+					Code: INTERNAL_SERVER_ERROR_CATEGORY_CREATE,
+					errMessage: 'Internal Server Error, please try again'
+				});
+		});
 });
 
 category.delete('/delete', async (req, res) => {
@@ -77,10 +80,13 @@ category.delete('/delete', async (req, res) => {
 		.andWhere('user_id', userID)
 		.del()
 		.then(data => res.json(data))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_CATEGORY_DELETE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_CATEGORY_DELETE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 
 category.post('/search', (req, res) => {
@@ -94,10 +100,13 @@ category.post('/search', (req, res) => {
 		.andWhere('blog_category_desc', '~*', categoryDesc)
 		.andWhere('user_id', '=', userID)
 		.then(data => res.status(200).json(data))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_CATEGORY_SEARCH,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_CATEGORY_SEARCH,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 
 category.put('/update', async (req, res) => {
@@ -129,10 +138,14 @@ category.put('/update', async (req, res) => {
 		.then(result => {
 			res.status(200).json(result);
 		})
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_CATEGORY_UPDATE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_CATEGORY_UPDATE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		}
+		);
 });
 
 module.exports = category;

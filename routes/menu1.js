@@ -22,12 +22,14 @@ menu1.post('/request', (req, res) => {
 			user_id: userID
 		})
 		.then(menu => res.status(200).json(menu))
-		.catch(() => res.status(500).json(
-			{
-				Code: INTERNAL_SERVER_ERROR_MENU1_REQUEST,
-				errMessage: 'Internal Server Error, please click Search button to try again'
-			})
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json(
+				{
+					Code: INTERNAL_SERVER_ERROR_MENU1_REQUEST,
+					errMessage: 'Internal Server Error, please click Search button to try again'
+				});
+		});
 });
 menu1.post('/create', async (req, res) => {
 	const { menu1Name, seq } = req.body;
@@ -56,12 +58,13 @@ menu1.post('/create', async (req, res) => {
 		.then(result => {
 			res.status(200).json(`command:${result.command},rowCount:${result.rowCount}`);
 		})
-		.catch(() => (
+		.catch((err) => {
+			console.log(err);
 			res.status(500).send({
 				Code: INTERNAL_SERVER_ERROR_MENU1_INSERT,
 				errMessage: 'Internal Server Error, please try again'
-			})
-		));
+			});
+		});
 });
 menu1.delete('/delete', async (req, res) => {
 	const { menu1ID } = req.body;
@@ -81,10 +84,13 @@ menu1.delete('/delete', async (req, res) => {
 		.andWhere('user_id', userID)
 		.del()
 		.then(data => res.status(200).json(data))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_MENU1_DELETE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_MENU1_DELETE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 menu1.post('/search', (req, res) => {
 	const { menuName } = req.body;
@@ -97,11 +103,13 @@ menu1.post('/search', (req, res) => {
 		.andWhere('menu_level', '=', 1)
 		.andWhere('user_id', '=', userID)
 		.then(menu => res.status(200).json(menu))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_MENU1_SEARCH,
-			errMessage: 'Internal Server Error, please try again'
-		}))
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_MENU1_SEARCH,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 menu1.put('/update', async (req, res) => {
 	const { menu1ID, menu1Name, seq } = req.body;
@@ -128,10 +136,13 @@ menu1.put('/update', async (req, res) => {
 		.then(result => {
 			res.status(200).json(result);
 		})
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_MENU1_UPDATE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_MENU1_UPDATE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 
 module.exports = menu1;

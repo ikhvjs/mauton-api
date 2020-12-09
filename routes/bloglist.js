@@ -9,7 +9,6 @@ const {
 bloglist.post('/request', (req, res) => {
 	const { menu2ID } = req.body;
 	const { userID } = req.user;
-	// console.table(req.body);
 	db.orderBy('seq','asc')
 		.select('tb.blog_id',
 		'tb.blog_title',
@@ -24,10 +23,7 @@ bloglist.post('/request', (req, res) => {
 		})
 		.join('tb_blog_category as bc', 'bc.blog_category_id', 'tb.blog_category_id')
 		.then(blogs => {
-			// console.log('blogs',blogs);
-
 			const promises = blogs.map((blog) => {
-				// console.log('blog',blog);
 				return db.select(
 					'tt.tag_id',
 					'tt.tag_name')
@@ -37,7 +33,6 @@ bloglist.post('/request', (req, res) => {
 							.andOn('tbtl.tag_id', '=', 'tt.tag_id')
 					})
 					.then(tags => {
-						// console.log('tags',tags);
 						Object.assign(blog, { tags: [...tags] })
 						return blog;
 					})
@@ -85,10 +80,7 @@ bloglist.post('/search', (req, res) => {
 				.andOn('tm.menu_id', '=', db.raw('?', [menuID]))
 		})
 		.then(blogs => {
-			// console.log('blogs',blogs);
-
 			const promises = blogs.map((blog) => {
-				// console.log('blog',blog);
 				return db.select(
 					'tt.tag_id',
 					'tt.tag_name')
@@ -99,7 +91,6 @@ bloglist.post('/search', (req, res) => {
 							.andOn('tt.tag_name', '~*', db.raw('?', [tagName]))
 					})
 					.then(tags => {
-						// console.log('tags',tags);
 						Object.assign(blog, { tags: [...tags] })
 						return blog;
 					})

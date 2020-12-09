@@ -16,9 +16,11 @@ topbar.post('/request', (req, res) => {
 			user_id: userID
 		})
 		.then(result => res.status(200).json(result))
-		.catch(() => res.status(500).json(
-			{ Code: INTERNAL_SERVER_ERROR_TOPBAR_REQUEST })
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json(
+				{ Code: INTERNAL_SERVER_ERROR_TOPBAR_REQUEST });
+		});
 });
 
 module.exports = topbar;

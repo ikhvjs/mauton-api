@@ -51,10 +51,13 @@ tag.post('/create', async (req, res) => {
 		.then(result => {
 			res.status(200).json(`command:${result.command},rowCount:${result.rowCount}`);
 		})
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_TAG_INSERT,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_TAG_INSERT,
+				errMessage: 'Internal Server Error, please try again'
+			})
+		});
 });
 
 tag.delete('/delete', async (req, res) => {
@@ -74,10 +77,13 @@ tag.delete('/delete', async (req, res) => {
 		.andWhere('user_id', userID)
 		.del()
 		.then(data => res.status(200).json(data))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_TAG_DELETE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_TAG_DELETE,
+				errMessage: 'Internal Server Error, please try again'
+			})
+		});
 });
 tag.post('/search', (req, res) => {
 	const { tagName } = req.body;
@@ -88,11 +94,13 @@ tag.post('/search', (req, res) => {
 		.where('tag_name', '~*', tagName)
 		.andWhere('user_id', '=', userID)
 		.then(tags => res.status(200).json(tags))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_TAG_SEARCH,
-			errMessage: 'Internal Server Error, please try again'
-		})));
-	// .catch(err => res.status(400).json('error search tag'));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_TAG_SEARCH,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 tag.put('/update', async (req, res) => {
 	const { tagID, tagName, seq } = req.body;
@@ -117,10 +125,13 @@ tag.put('/update', async (req, res) => {
 		.then(result => {
 			res.status(200).json(result);
 		})
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_TAG_UPDATE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_TAG_UPDATE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 
 module.exports = tag

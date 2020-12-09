@@ -29,13 +29,14 @@ menu2.post('/request', (req, res) => {
 				.andOn('tm1.user_id', '=', userID)
 		})
 		.then(menu => res.status(200).json(menu))
-		.catch(() =>
+		.catch((err) => {
+			console.log(err);
 			res.status(500).json(
 				{
 					Code: INTERNAL_SERVER_ERROR_MENU2_REQUEST,
 					errMessage: 'Internal Server Error, please click Search button to try again'
-				})
-		);
+				});
+		});
 });
 
 menu2.post('/create', async (req, res) => {
@@ -65,12 +66,13 @@ menu2.post('/create', async (req, res) => {
 		.then(result => {
 			res.status(200).json(`command:${result.command},rowCount:${result.rowCount}`);
 		})
-		.catch(() => (
+		.catch((err) => {
+			console.log(err);
 			res.status(500).send({
 				Code: INTERNAL_SERVER_ERROR_MENU2_INSERT,
 				errMessage: 'Internal Server Error, please try again'
-			})
-		));
+			});
+		});
 });
 menu2.delete('/delete', async (req, res) => {
 	const { menu2ID } = req.body;
@@ -89,11 +91,13 @@ menu2.delete('/delete', async (req, res) => {
 		.andWhere('user_id', userID)
 		.del()
 		.then(data => res.status(200).json(data))
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_MENU2_DELETE,
-			errMessage: 'Internal Server Error, please try again'
-		}))
-		);
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_MENU2_DELETE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 menu2.post('/search', (req, res) => {
 	const { menuName, parentMenuName } = req.body;
@@ -149,10 +153,13 @@ menu2.put('/update', async (req, res) => {
 		.then(result => {
 			res.status(200).json(result);
 		})
-		.catch(() => (res.status(500).send({
-			Code: INTERNAL_SERVER_ERROR_MENU2_UPDATE,
-			errMessage: 'Internal Server Error, please try again'
-		})));
+		.catch((err) => {
+			console.log(err);
+			res.status(500).send({
+				Code: INTERNAL_SERVER_ERROR_MENU2_UPDATE,
+				errMessage: 'Internal Server Error, please try again'
+			});
+		});
 });
 
 module.exports = menu2;
