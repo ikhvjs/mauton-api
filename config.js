@@ -3,7 +3,7 @@ const env = process.env.NODE_ENV || "dev"
 const configs = {
     base: {
         env,
-        tokenExpiredTime : process.env.TOKEN_EXPIRY_TIME, //in seconds
+        tokenExpiredTime : Number(process.env.TOKEN_EXPIRY_TIME), //in seconds
 		secret: process.env.TOKEN_KEY,
 		captchaSecret: process.env.CAPTCHA_KEY,
     },
