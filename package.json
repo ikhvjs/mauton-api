@@ -18,8 +18,8 @@
     "start": "node server.js",
     "start:dev": "nodemon server.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "ikhvjs",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ikhvjs/mauton-api.git"
