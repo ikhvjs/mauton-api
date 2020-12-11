@@ -1,4 +1,4 @@
-# mauton-api :octocat: [![GitHub](https://img.shields.io/github/license/ikhvjs/mauton-api?color=blue)](https://github.com/ikhvjs/mauton-api/blob/master/README.md)
+# mauton-api :octocat: [![GitHub](https://img.shields.io/github/license/ikhvjs/mauton-api)](https://github.com/ikhvjs/mauton-api/blob/master/README.md)
 mauton-api is backend for mauton
 
 
